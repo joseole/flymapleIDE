@@ -22,7 +22,7 @@
 #define ADXLREG_DATAZ1       0x37
 
 // Accelerometer correction offset
-int16 a_offset[3];
+//int16 a_offset[3];
 ////////////////////////////////////////////////////////////////////////////////////
 // Function prototype: void initAcc (void)
 // Parameter Description: None
@@ -34,7 +34,7 @@ void initAcc(void)
   //all i2c transactions send and receive arrays of i2c_msg objects 
   i2c_msg msgs[1]; // we dont do any bursting here, so we only need one i2c_msg object
   uint8 msg_data[2]= {
-    0x00,0x00  };
+    0x00,0x00    };
   msgs[0].addr = ACC;
   msgs[0].flags = 0; 
   msgs[0].length = 1; // just one byte for the address to read, 0x00
@@ -60,26 +60,7 @@ void initAcc(void)
   //invoke ADXL345
   writeTo(ACC,ADXLREG_DATA_FORMAT,0x08); //Set accelerometer to +/-2g
   writeTo(ACC,ADXLREG_POWER_CTL,0x08); //Set accelerometer to measure mode
-  
-  
-  // Calculate offset
-  float accumulator[] = {
-    0,0,0    };
-  SerialUSB.print("adding to accumulator ");
-  for(int i = 0 ; i < 100 ; i++) {
-    short acc[3];
-    getAccelerometerData(acc);
-    SerialUSB.println(acc[1]);
-    accumulator[0] += acc[0];
-    accumulator[1] += acc[1];
-    accumulator[2] += acc[2];
-    delay(10)  ;
-  }
-  SerialUSB.print("total value is ");
-  SerialUSB.println(accumulator[1] / 100);
-  for(int i = 0 ; i < 3 ; i++) accumulator[i] /= 100;
-  accumulator[2] -= 500; // 1g at 2mg/LSB more or less.
-  for(int i = 0 ; i < 3 ; i++) a_offset[i] = accumulator[i];
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -97,9 +78,15 @@ void getAccelerometerData(int16 * result)
 
   //Readings for each axis with 10-bit resolution, ie 2 bytes.  
   //We want to convert two bytes into an int variable
-  result[0] = ((((int16)buff[1]) << 8) | buff[0]) - a_offset[0];   
-  result[1] = ((((int16)buff[3]) << 8) | buff[2]) - a_offset[1];
-  result[2] = ((((int16)buff[5]) << 8) | buff[4]) - a_offset[2];
+  ACC[0] = ((((int16)buff[1]) << 8) | buff[0]);   
+  ACC[1] = ((((int16)buff[3]) << 8) | buff[2]);
+  ACC[2] = ((((int16)buff[5]) << 8) | buff[4]);
+  AN[3] = ACC[0];
+  AN[4] = ACC[1];
+  AN[5] = ACC[2];
+  result[0] = SENSOR_SIGN[3]*(ACC[0]-AN_OFFSET[3]);
+  result[0] = SENSOR_SIGN[4]*(ACC[1]-AN_OFFSET[4]);
+  result[0] = SENSOR_SIGN[5]*(ACC[2]-AN_OFFSET[5]);
 }
 void accelerometerTest(void)//ADXL345 accelerometer reading test example
 {
@@ -119,6 +106,7 @@ void accelerometerTest(void)//ADXL345 accelerometer reading test example
     delay(100);
   }
 }
+
 
 
 

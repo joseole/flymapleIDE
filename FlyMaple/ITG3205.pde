@@ -8,9 +8,9 @@
 #define G_TO_READ 8 // x,y,z 每个轴2个字节，另外再加上2个字节的温度
 
 // 陀螺仪误差修正的偏移量,在陀螺仪初始化的时候将零值读取回来保存进去 
-int16 g_offx = 0;
-int16 g_offy = 0;
-int16 g_offz = 0;
+//int16 g_offx = 0;
+//int16 g_offy = 0;
+//int16 g_offz = 0;
 
 ////////////////////////////////////////////////////////////////////////////////////
 //函数原型:  void initGyro(void)             	     
@@ -20,27 +20,27 @@ int16 g_offz = 0;
 ///////////////////////////////////////////////////////////////////////////////////
 void initGyro(void)
 {
-   ///////////////////////////////////////////////
-   // ITG 3200
-   // 电源管理设定：
-   // 时钟选择 =内部振荡器
-   // 无复位, 无睡眠模式
-   // 无待机模式
-   // 采样率 = 125Hz
-   // 参数为+ / - 2000度/秒
-   // 低通滤波器=5HZ
-   // 没有中断
-   ///////////////////////////////////////////////////
-   
+  ///////////////////////////////////////////////
+  // ITG 3200
+  // 电源管理设定：
+  // 时钟选择 =内部振荡器
+  // 无复位, 无睡眠模式
+  // 无待机模式
+  // 采样率 = 125Hz
+  // 参数为+ / - 2000度/秒
+  // 低通滤波器=5HZ
+  // 没有中断
+  ///////////////////////////////////////////////////
+
   ////////////////////FreeIMU 的定义//////////////////////////////
-//  writeTo(GYRO, G_SMPLRT_DIV, 0x00);//分频系数为0，不分频，采样率为8KHZ
-//  writeTo(GYRO, G_DLPF_FS, 0x18);//采样频率8KHZ，带宽256HZ
-//  writeTo(GYRO, G_PWR_MGM, 0x01);  //PLL with X Gyro reference
-  
+  //  writeTo(GYRO, G_SMPLRT_DIV, 0x00);//分频系数为0，不分频，采样率为8KHZ
+  //  writeTo(GYRO, G_DLPF_FS, 0x18);//采样频率8KHZ，带宽256HZ
+  //  writeTo(GYRO, G_PWR_MGM, 0x01);  //PLL with X Gyro reference
+
   writeTo(GYRO, G_PWR_MGM, 0x00);  //Internal oscillator
   writeTo(GYRO, G_SMPLRT_DIV, 0x07); // Fsample = 1kHz / (7 + 1) = 125Hz, or 8ms per sample.ITG3205 datasheet page 24    
   writeTo(GYRO, G_DLPF_FS, 0x1E);   //陀螺仪测量量程 +/- 2000 dgrs/sec, 1KHz 采样率,Low Pass Filter Bandwidth 5HZ
-  
+
   writeTo(GYRO, G_INT_CFG, 0x00);   //关闭所有中断  
 }
 ////////////////////////////////////////////////////////////////////////////////////
@@ -50,36 +50,37 @@ void initGyro(void)
 //返回值:    无                                                               
 //说明:      读取ITG3205陀螺仪静止状态下的零值将这个值记录后
 ///////////////////////////////////////////////////////////////////////////////////
-void zeroCalibrateGyroscope(uint16 totSamples, uint16 sampleDelayMS) 
-{
-   //////////////////////////////////////
-   // 陀螺仪ITG- 3205的I2C
-   // 寄存器：
-   // temp MSB = 1B, temp LSB = 1C
-   // x axis MSB = 1D, x axis LSB = 1E
-   // y axis MSB = 1F, y axis LSB = 20
-   // z axis MSB = 21, z axis LSB = 22
-   /////////////////////////////////////
-  uint8 regAddress = 0x1D; // x axis MSB
-  int16 xyz[3]; 
-  float tmpOffsets[] = {0,0,0};
-  uint8 buff[6];
-
-  for (uint16 i = 0;i < totSamples;i++)
-  {
-    delay(sampleDelayMS);
-    readFrom(GYRO, regAddress, 6, buff); //读取陀螺仪ITG3200 XYZ轴的数据
-    xyz[0]= (((int16)buff[0] << 8) | buff[1]);
-    xyz[1] = (((int16)buff[2] << 8) | buff[3]);
-    xyz[2] = (((int16)buff[4] << 8) | buff[5]);
-    tmpOffsets[0] += xyz[0];
-    tmpOffsets[1] += xyz[1];
-    tmpOffsets[2] += xyz[2];  
-  }
-  g_offx = -tmpOffsets[0] / totSamples;
-  g_offy = -tmpOffsets[1] / totSamples;
-  g_offz = -tmpOffsets[2] / totSamples;
-}
+//void zeroCalibrateGyroscope(uint16 totSamples, uint16 sampleDelayMS) 
+//{
+//  //////////////////////////////////////
+//  // 陀螺仪ITG- 3205的I2C
+//  // 寄存器：
+//  // temp MSB = 1B, temp LSB = 1C
+//  // x axis MSB = 1D, x axis LSB = 1E
+//  // y axis MSB = 1F, y axis LSB = 20
+//  // z axis MSB = 21, z axis LSB = 22
+//  /////////////////////////////////////
+//  uint8 regAddress = 0x1D; // x axis MSB
+//  int16 xyz[3]; 
+//  float tmpOffsets[] = {
+//    0,0,0  };
+//  uint8 buff[6];
+//
+//  for (uint16 i = 0;i < totSamples;i++)
+//  {
+//    delay(sampleDelayMS);
+//    readFrom(GYRO, regAddress, 6, buff); //读取陀螺仪ITG3200 XYZ轴的数据
+//    xyz[0]= (((int16)buff[0] << 8) | buff[1]);
+//    xyz[1] = (((int16)buff[2] << 8) | buff[3]);
+//    xyz[2] = (((int16)buff[4] << 8) | buff[5]);
+//    tmpOffsets[0] += xyz[0];
+//    tmpOffsets[1] += xyz[1];
+//    tmpOffsets[2] += xyz[2];  
+//  }
+//  g_offx = -tmpOffsets[0] / totSamples;
+//  g_offy = -tmpOffsets[1] / totSamples;
+//  g_offz = -tmpOffsets[2] / totSamples;
+//}
 
 ////////////////////////////////////////////////////////////////////////////////////
 //函数原型:  void getGyroscopeRaw(int16 * result)  	     
@@ -89,25 +90,30 @@ void zeroCalibrateGyroscope(uint16 totSamples, uint16 sampleDelayMS)
 ///////////////////////////////////////////////////////////////////////////////////
 void getGyroscopeRaw(int16 * result)
 {
-   //////////////////////////////////////
-   // 陀螺仪ITG- 3200的I2C
-   // 寄存器：
-   // temp MSB = 1B, temp LSB = 1C
-   // x axis MSB = 1D, x axis LSB = 1E
-   // y axis MSB = 1F, y axis LSB = 20
-   // z axis MSB = 21, z axis LSB = 22
-   /////////////////////////////////////
+  //////////////////////////////////////
+  // 陀螺仪ITG- 3200的I2C
+  // 寄存器：
+  // temp MSB = 1B, temp LSB = 1C
+  // x axis MSB = 1D, x axis LSB = 1E
+  // y axis MSB = 1F, y axis LSB = 20
+  // z axis MSB = 21, z axis LSB = 22
+  /////////////////////////////////////
 
   uint8 regAddress = 0x1B;
-  int16 temp, x, y, z;
   uint8 buff[G_TO_READ];
 
   readFrom(GYRO, regAddress, G_TO_READ, buff); //读取陀螺仪ITG3200的数据
 
-  result[0] = (((int16)buff[2] << 8) | buff[3]) + g_offx;
-  result[1] = (((int16)buff[4] << 8) | buff[5]) + g_offy;
-  result[2] = (((int16)buff[6] << 8) | buff[7]) + g_offz;
-  result[3] = ((int16)buff[0] << 8) | buff[1]; // 温度
+  GYRO[0] = ((((int16)buff[0]) << 8) | buff[1]);    // X axis
+  GYRO[1] = ((((int16)buff[2]) << 8) | buff[3]);    // Y axis
+  GYRO[2] = ((((int16)buff[4]) << 8) | buff[5]);    // Z axis
+  AN[0] = GYRO[0];
+  AN[1] = GYRO[1];
+  AN[2] = GYRO[2];
+  result[0] = SENSOR_SIGN[0]*(GYRO[0]-AN_OFFSET[0]);
+  result[1] = SENSOR_SIGN[1]*(GYRO[1]-AN_OFFSET[1]);
+  result[2] = SENSOR_SIGN[2]*(GYRO[2]-AN_OFFSET[2]);
+  result[3] = ((int16)buff[0] << 8) | buff[1]; // temperature
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -126,24 +132,25 @@ void getGyroscopeData(float * result)
 }
 void GyroscopeTest(void)  //ITG3205加速度读取测试例子
 {
-    float gyro[3];
-     initGyro();           //初始化陀螺仪
-    delay(1000);
-    zeroCalibrateGyroscope(128,5);  //零值校正，记录陀螺仪静止状态输出的值将这个值保存到偏移量，采集128次，采样周期5ms
-    while(1)
-    {
-      getGyroscopeData(gyro);    //读取陀螺仪      
-      SerialUSB.print("Xg=");
-      SerialUSB.print(gyro[0]);
-      SerialUSB.print("    ");
-      SerialUSB.print("Yg=");  
-      SerialUSB.print(gyro[1]);
-      SerialUSB.print("    ");
-      SerialUSB.print("Zg=");  
-      SerialUSB.print(gyro[2]);
-      SerialUSB.println("    ");
-      delay(100);
-    }
+  float gyro[3];
+  initGyro();           //初始化陀螺仪
+  delay(1000);
+  //zeroCalibrateGyroscope(128,5);  //零值校正，记录陀螺仪静止状态输出的值将这个值保存到偏移量，采集128次，采样周期5ms
+  while(1)
+  {
+    getGyroscopeData(gyro);    //读取陀螺仪      
+    SerialUSB.print("Xg=");
+    SerialUSB.print(gyro[0]);
+    SerialUSB.print("    ");
+    SerialUSB.print("Yg=");  
+    SerialUSB.print(gyro[1]);
+    SerialUSB.print("    ");
+    SerialUSB.print("Zg=");  
+    SerialUSB.print(gyro[2]);
+    SerialUSB.println("    ");
+    delay(100);
+  }
 }
+
 
 

@@ -20,7 +20,9 @@ int16 startLoopTime;
 ///////////////////////////////////////////////////////////////////////////////////
 void initAHRS(void)
 {
-
+  // offsets
+  float aux_float[6];
+  
   // 初始化四元数 initialize quaternion
   q0 = 1.0f;
   q1 = 0.0f;
@@ -47,39 +49,58 @@ void initAHRS(void)
   //configure I2C port 1 (pins 5, 9) with no special option flags (second argument)
   i2c_master_enable(I2C1, I2C_FAST_MODE);  //设置I2C1接口，主机模式
 
+  // Calculate offsets
+    for(uint8 i=0;i<100;i++)    // We take some readings...
+  {
+    //ITG3200_Read();  // not doing this for now..
+    getAccelerometerData();
+    for(uint8 y=0; y<6; y++)   // Cumulate values
+      aux_float[y] += AN[y];
+    delay(20);
+  }
+
+  for(uint8 y=0; y<6; y++)
+    AN_OFFSET[y] = aux_float[y]/100;
+
+  AN_OFFSET[5]-=GRAVITY*SENSOR_SIGN[5];
+
+  SerialUSB.println("Offsets:");
+  for(uint8 y=0; y<6; y++)
+    SerialUSB.println(AN_OFFSET[y]);
+
 
   // Accelerometer start
-  SerialUSB.println("Initializing the Accelerometer...");
+  SerialUSB.print("Initializing the Accelerometer...");
   initAcc();            //初始化加速度计
   delay(1000);
-  SerialUSB.println("Initializing the Accelerometer... Done!");
+  SerialUSB.println("	Done!");
 
 
   // Gyroscope start
-  SerialUSB.println("Initializing the Gyroscope...");
+  SerialUSB.print("Initializing the Gyroscope...");
   initGyro();           //初始化陀螺仪
   delay(1000);
-  SerialUSB.println("Initializing the Gyroscope... Done!");
+  SerialUSB.println("	Done!");
 
-  SerialUSB.println("Calibrating the Gyroscope...");
-  zeroCalibrateGyroscope(128,5);  //零值校正，记录陀螺仪静止状态输出的值将这个值保存到偏移量，采集128次，采样周期5ms
-  SerialUSB.println("Calibrating the Gyroscope... Done!");
+  SerialUSB.print("Calibrating it...");
+  //zeroCalibrateGyroscope(128,5);  //零值校正，记录陀螺仪静止状态输出的值将这个值保存到偏移量，采集128次，采样周期5ms
+  SerialUSB.println("		Done!");
 
 
   // Barometer start
-  SerialUSB.println("Calibrating the Barometer...");
+  SerialUSB.print("Calibrating the Barometer...");
   bmp085Calibration();  //初始化气压高度计
-  SerialUSB.println("Calibrating the Barometer... Done!");
+  SerialUSB.println("	Done!");
 
 
   // Compass start
-  SerialUSB.println("Initializing the Compass...");
+  SerialUSB.print("Initializing the Compass...");
   compassInit(false);   //初始化罗盘
-  SerialUSB.println("Initializing the Compass... Done!");
+  SerialUSB.println("	Done!");
 
-  SerialUSB.println("Calibrating the Compass...");
+  SerialUSB.print("Calibrating it...");
   compassCalibrate(1);  //校准一次罗盘，gain为1.3Ga
-  SerialUSB.println("Calibrating the Compass... Done!");
+  SerialUSB.println("		Done!");
   compassSetMode(0);  //设置为连续测量模式  
 }
 
@@ -90,19 +111,6 @@ void initAHRS(void)
 //说明:      读取AHRS数据
 ///////////////////////////////////////////////////////////////////////////////////
 
-// Kalman thanks to http://interactive-matter.eu/blog/2009/12/18/filtering-sensor-data-with-a-kalman-filter/
-double kalman_q = 1;
-double kalman_r = 32;
-double kalman_p = 0;
-kalman_state kalman_a_x = kalman_init(kalman_q,kalman_r,kalman_p,0);
-kalman_state kalman_a_y = kalman_init(kalman_q,kalman_r,kalman_p,0);
-kalman_state kalman_a_z = kalman_init(kalman_q,kalman_r,kalman_p,0);
-kalman_state kalman_g_x = kalman_init(kalman_q,kalman_r,kalman_p,0);
-kalman_state kalman_g_y = kalman_init(kalman_q,kalman_r,kalman_p,0);
-kalman_state kalman_g_z = kalman_init(kalman_q,kalman_r,kalman_p,0);
-kalman_state kalman_m_x = kalman_init(kalman_q,kalman_r,kalman_p,0);
-kalman_state kalman_m_y = kalman_init(kalman_q,kalman_r,kalman_p,0);
-kalman_state kalman_m_z = kalman_init(kalman_q,kalman_r,kalman_p,0);
 void AHRSgetValues(float * values) 
 {  
   float valG[3];
@@ -122,35 +130,6 @@ void AHRSgetValues(float * values)
   values[7] = ((float) valC[1]);
   values[8] = ((float) valC[2]);
 }
-
-// apply a kalman filter to values
-void AHRSgetFilteredValues(float * values)
-{
-  float unfiltered[9];
-  AHRSgetValues(unfiltered);
-  
-  kalman_update(&kalman_g_x,unfiltered[0]);
-  kalman_update(&kalman_g_y,unfiltered[1]);
-  kalman_update(&kalman_g_z,unfiltered[2]);
-  kalman_update(&kalman_a_x,unfiltered[3]);
-  kalman_update(&kalman_a_y,unfiltered[4]);
-  kalman_update(&kalman_a_z,unfiltered[5]);
-  kalman_update(&kalman_m_x,unfiltered[6]);
-  kalman_update(&kalman_m_y,unfiltered[7]);
-  kalman_update(&kalman_m_z,unfiltered[8]);
-  
-  values[0] = kalman_g_x.x;
-  values[1] = kalman_g_y.x;
-  values[2] = kalman_g_z.x;
-  values[3] = kalman_a_x.x;
-  values[4] = kalman_a_y.x;
-  values[5] = kalman_a_z.x;
-  values[6] = kalman_m_x.x;
-  values[7] = kalman_m_y.x;
-  values[8] = kalman_m_z.x;
-  
-}
-
 
 // Fast inverse square-root
 // See: http://en.wikipedia.org/wiki/Fast_inverse_square_root
@@ -344,7 +323,7 @@ void AHRSupdate(float gx, float gy, float gz, float ax, float ay, float az, floa
 void AHRSgetQ(float * q) 
 {
   float val[9];
-  AHRSgetFilteredValues(val);
+  AHRSgetValues(val);
 
   now = micros();
   sampleFreq = 1.0 / ((now - lastUpdate) / 1000000.0);
@@ -423,7 +402,7 @@ void Display_Raw(void)
   delay(5);
   while(1)
   {  
-    AHRSgetFilteredValues(data);
+    AHRSgetValues(data);
     SerialUSB.print(data[0]);
     SerialUSB.print(" | ");  
     SerialUSB.print(data[1]);
