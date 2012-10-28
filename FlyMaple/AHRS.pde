@@ -52,8 +52,8 @@ void initAHRS(void)
   // Calculate offsets
     for(uint8 i=0;i<100;i++)    // We take some readings...
   {
-    //ITG3200_Read();  // not doing this for now..
-    getAccelerometerData();
+    getGyroscopeRaw(result);  // ignore result values?
+    getAccelerometerData(result);
     for(uint8 y=0; y<6; y++)   // Cumulate values
       aux_float[y] += AN[y];
     delay(20);
@@ -82,9 +82,9 @@ void initAHRS(void)
   delay(1000);
   SerialUSB.println("	Done!");
 
-  SerialUSB.print("Calibrating it...");
+  //SerialUSB.print("Calibrating it...");
   //zeroCalibrateGyroscope(128,5);  //零值校正，记录陀螺仪静止状态输出的值将这个值保存到偏移量，采集128次，采样周期5ms
-  SerialUSB.println("		Done!");
+  //SerialUSB.println("		Done!");
 
 
   // Barometer start

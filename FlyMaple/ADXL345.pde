@@ -85,8 +85,8 @@ void getAccelerometerData(int16 * result)
   AN[4] = ACC[1];
   AN[5] = ACC[2];
   result[0] = SENSOR_SIGN[3]*(ACC[0]-AN_OFFSET[3]);
-  result[0] = SENSOR_SIGN[4]*(ACC[1]-AN_OFFSET[4]);
-  result[0] = SENSOR_SIGN[5]*(ACC[2]-AN_OFFSET[5]);
+  result[1] = SENSOR_SIGN[4]*(ACC[1]-AN_OFFSET[4]);
+  result[2] = SENSOR_SIGN[5]*(ACC[2]-AN_OFFSET[5]);
 }
 void accelerometerTest(void)//ADXL345 accelerometer reading test example
 {

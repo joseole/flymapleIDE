@@ -21,24 +21,14 @@ int16  ACC[3];          //array that store the raw accelerometers data
 int16  GYRO[3];
 int16 SENSOR_SIGN[9] = {
   1,-1,-1,1,1,1,-1,-1,-1};  //{1,-1,-1,1,1,1,-1,-1,-1};  //Correct directions x,y,z - gyros, accels, magnetormeter
-
-int16  accel_x;
-int16  accel_y;
-int16  accel_z;
-int16  gyro_x;
-int16  gyro_y;
-int16  gyro_z;
-int16  magnetom_x;
-int16  magnetom_y;
-int16  magnetom_z;
   
 // ADXL345 Sensitivity(from datasheet) => 4mg/LSB   1G => 1000mg/4mg = 256 steps
 // Tested value : 248
 #define GRAVITY 248  //this equivalent to 1G in the raw data coming from the accelerometer 
-#define Accel_Scale(x) x*(GRAVITY/9.81)//Scaling the raw data of the accel to actual acceleration in meters for seconds square
+//#define Accel_Scale(x) x*(GRAVITY/9.81)//Scaling the raw data of the accel to actual acceleration in meters for seconds square
 
-#define ToRad(x) (x*0.01745329252)  // *pi/180
-#define ToDeg(x) (x*57.2957795131)  // *180/pi
+//#define ToRad(x) (x*0.01745329252)  // *pi/180
+//#define ToDeg(x) (x*57.2957795131)  // *180/pi
 
 ////////////////////////////////////////////////////////////////////////////////////
 // Function prototype: void setup ()
