@@ -15,10 +15,10 @@ extern volatile unsigned int chan4PPM;
 
 // Offsets buffer and other stuff for sensors
 int16 AN[6];
-int16  AN_OFFSET[6]={
+int16 AN_OFFSET[6]={
   0,0,0,0,0,0}; //Array that stores the Offset of the sensors
-int16  ACC[3];          //array that store the raw accelerometers data
-int16  GYRO[3];
+int16 ACCa[4];          //array that store the raw accelerometers data
+int16 GYROa[4];
 int16 SENSOR_SIGN[9] = {
   1,-1,-1,1,1,1,-1,-1,-1};  //{1,-1,-1,1,1,1,-1,-1,-1};  //Correct directions x,y,z - gyros, accels, magnetormeter
   

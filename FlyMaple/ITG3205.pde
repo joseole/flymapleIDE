@@ -104,15 +104,15 @@ void getGyroscopeRaw(int16 * result)
 
   readFrom(GYRO, regAddress, G_TO_READ, buff); //读取陀螺仪ITG3200的数据
 
-  GYRO[0] = ((((int16)buff[0]) << 8) | buff[1]);    // X axis
-  GYRO[1] = ((((int16)buff[2]) << 8) | buff[3]);    // Y axis
-  GYRO[2] = ((((int16)buff[4]) << 8) | buff[5]);    // Z axis
-  AN[0] = GYRO[0];
-  AN[1] = GYRO[1];
-  AN[2] = GYRO[2];
-  result[0] = SENSOR_SIGN[0]*(GYRO[0]-AN_OFFSET[0]);
-  result[1] = SENSOR_SIGN[1]*(GYRO[1]-AN_OFFSET[1]);
-  result[2] = SENSOR_SIGN[2]*(GYRO[2]-AN_OFFSET[2]);
+  GYROa[0] = (((int16)buff[0]) << 8) | buff[1];    // X axis
+  GYROa[1] = (((int16)buff[2]) << 8) | buff[3];    // Y axis
+  GYROa[2] = (((int16)buff[4]) << 8) | buff[5];    // Z axis
+  AN[0] = GYROa[0];
+  AN[1] = GYROa[1];
+  AN[2] = GYROa[2];
+  result[0] = SENSOR_SIGN[0]*(GYROa[0]-AN_OFFSET[0]);
+  result[1] = SENSOR_SIGN[1]*(GYROa[1]-AN_OFFSET[1]);
+  result[2] = SENSOR_SIGN[2]*(GYROa[2]-AN_OFFSET[2]);
   result[3] = ((int16)buff[0] << 8) | buff[1]; // temperature
 }
 

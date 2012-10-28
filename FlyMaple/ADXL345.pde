@@ -78,15 +78,15 @@ void getAccelerometerData(int16 * result)
 
   //Readings for each axis with 10-bit resolution, ie 2 bytes.  
   //We want to convert two bytes into an int variable
-  ACC[0] = ((((int16)buff[1]) << 8) | buff[0]);   
-  ACC[1] = ((((int16)buff[3]) << 8) | buff[2]);
-  ACC[2] = ((((int16)buff[5]) << 8) | buff[4]);
-  AN[3] = ACC[0];
-  AN[4] = ACC[1];
-  AN[5] = ACC[2];
-  result[0] = SENSOR_SIGN[3]*(ACC[0]-AN_OFFSET[3]);
-  result[1] = SENSOR_SIGN[4]*(ACC[1]-AN_OFFSET[4]);
-  result[2] = SENSOR_SIGN[5]*(ACC[2]-AN_OFFSET[5]);
+  ACCa[0] = (((int16)buff[1]) << 8) | buff[0];   
+  ACCa[1] = (((int16)buff[3]) << 8) | buff[2];
+  ACCa[2] = (((int16)buff[5]) << 8) | buff[4];
+  AN[3] = ACCa[0];
+  AN[4] = ACCa[1];
+  AN[5] = ACCa[2];
+  result[0] = SENSOR_SIGN[3]*(ACCa[0]-AN_OFFSET[3]);
+  result[1] = SENSOR_SIGN[4]*(ACCa[1]-AN_OFFSET[4]);
+  result[2] = SENSOR_SIGN[5]*(ACCa[2]-AN_OFFSET[5]);
 }
 void accelerometerTest(void)//ADXL345 accelerometer reading test example
 {
