@@ -104,9 +104,9 @@ void getGyroscopeRaw(int16 * result)
 
   readFrom(GYRO, regAddress, G_TO_READ, buff); //读取陀螺仪ITG3200的数据
 
-  GYROa[0] = (((int16)buff[0]) << 8) | buff[1];    // X axis
-  GYROa[1] = (((int16)buff[2]) << 8) | buff[3];    // Y axis
-  GYROa[2] = (((int16)buff[4]) << 8) | buff[5];    // Z axis
+  GYROa[0] = (((int16)buff[2]) << 8) | buff[1];    // X axis
+  GYROa[1] = (((int16)buff[4]) << 8) | buff[3];    // Y axis
+  GYROa[2] = (((int16)buff[6]) << 8) | buff[5];    // Z axis
   AN[0] = GYROa[0];
   AN[1] = GYROa[1];
   AN[2] = GYROa[2];

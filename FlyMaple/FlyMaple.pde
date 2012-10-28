@@ -17,18 +17,10 @@ extern volatile unsigned int chan4PPM;
 int16 AN[6];
 int16 AN_OFFSET[6]={
   0,0,0,0,0,0}; //Array that stores the Offset of the sensors
-int16 ACCa[4];          //array that store the raw accelerometers data
-int16 GYROa[4];
+int16 ACCa[3];          //array that store the raw accelerometers data
+int16 GYROa[3];
 int16 SENSOR_SIGN[9] = {
   1,-1,-1,1,1,1,-1,-1,-1};  //{1,-1,-1,1,1,1,-1,-1,-1};  //Correct directions x,y,z - gyros, accels, magnetormeter
-  
-// ADXL345 Sensitivity(from datasheet) => 4mg/LSB   1G => 1000mg/4mg = 256 steps
-// Tested value : 248
-#define GRAVITY 248  //this equivalent to 1G in the raw data coming from the accelerometer 
-//#define Accel_Scale(x) x*(GRAVITY/9.81)//Scaling the raw data of the accel to actual acceleration in meters for seconds square
-
-//#define ToRad(x) (x*0.01745329252)  // *pi/180
-//#define ToDeg(x) (x*57.2957795131)  // *180/pi
 
 ////////////////////////////////////////////////////////////////////////////////////
 // Function prototype: void setup ()
@@ -47,10 +39,10 @@ void setup()
   //motorInit();
   SerialUSB.println("Initializing the Motors...	Disabled");
   //capturePPMInit();
-  SerialUSB.println("Initializing the PPM...	Disabled");
+  SerialUSB.println("Initializing the PPM...		Disabled");
 
 
-  SerialUSB.println("Initialization... 		Complete!");
+  SerialUSB.println("Initialization... 		Complete!\n");
 }
 
 
@@ -87,5 +79,6 @@ void loop()
   //compassTest();
 
 }
+
 
 

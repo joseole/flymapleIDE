@@ -2,6 +2,14 @@
 #define twoKpDef  (2.0f * 0.1f) // 2 * proportional gain 两倍比例增益
 #define twoKiDef  (2.0f * 0.1f) // 2 * integral gain    两倍积分增益
 
+// ADXL345 Sensitivity(from datasheet) => 4mg/LSB   1G => 1000mg/4mg = 256 steps
+// Tested value : 248
+#define GRAVITY 248  //this equivalent to 1G in the raw data coming from the accelerometer 
+#define Accel_Scale(x) x*(GRAVITY/9.81)//Scaling the raw data of the accel to actual acceleration in meters for seconds square
+
+#define ToRad(x) (x*0.01745329252)  // *pi/180
+#define ToDeg(x) (x*57.2957795131)  // *180/pi
+
 float iq0, iq1, iq2, iq3;    //计算变量
 float exInt, eyInt, ezInt;  // scaled integral error  比例积分误差
 volatile float twoKp;      // 2 * proportional gain (Kp) 两倍比例增益 变量
@@ -11,6 +19,9 @@ volatile float integralFBx,  integralFBy, integralFBz;
 uint32 lastUpdate, now; // sample period expressed in milliseconds  采样周期变量，单位毫秒
 float sampleFreq; // half the sample period expressed in seconds
 int16 startLoopTime;
+
+  
+
 
 ////////////////////////////////////////////////////////////////////////////////////
 //函数原型:  void initAHRS(void)       	     
@@ -65,12 +76,15 @@ void initAHRS(void)
   AN_OFFSET[5]-=GRAVITY*SENSOR_SIGN[5];
 
   SerialUSB.println("Offsets:");
-  for(uint8 y=0; y<6; y++)
-    SerialUSB.println(AN_OFFSET[y]);
+  for(uint8 y=0; y<6; y++){
+    SerialUSB.print(AN_OFFSET[y]);
+    SerialUSB.print(", ");
+  }
+    
 
 
   // Accelerometer start
-  SerialUSB.print("Initializing the Accelerometer...");
+  SerialUSB.print("\n\nInitializing the Accelerometer...");
   initAcc();            //初始化加速度计
   delay(1000);
   SerialUSB.println("	Done!");
@@ -329,9 +343,9 @@ void AHRSgetQ(float * q)
   sampleFreq = 1.0 / ((now - lastUpdate) / 1000000.0);
   lastUpdate = now;
   // 9DOF IMU
-  //AHRSupdate(val[0], val[1], val[2], val[3], val[4], val[5], val[6], val[7], val[8]);
+  AHRSupdate(val[0], val[1], val[2], val[3], val[4], val[5], val[6], val[7], val[8]);
   // 6DOF IMU
-  AHRSupdate(val[0], val[1], val[2], val[3], val[4], val[5], 0.0f, 0.0f, 0.0f);
+  //AHRSupdate(val[0], val[1], val[2], val[3], val[4], val[5], 0.0f, 0.0f, 0.0f);
   q[0] = q0;
   q[1] = q1;
   q[2] = q2;
