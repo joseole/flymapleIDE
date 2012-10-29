@@ -63,8 +63,8 @@ void initAHRS(void)
   // Calculate offsets
     for(uint8 i=0;i<100;i++)    // We take some readings...
   {
-    getGyroscopeRaw(0);  // '0' to ignore result values?
-    getAccelerometerData(0);
+    getGyroOffset();  // '0' to ignore result values?
+    getAccOffsets();
     for(uint8 y=0; y<6; y++)   // Cumulate values
       aux_float[y] += AN[y];
     delay(20);

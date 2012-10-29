@@ -88,6 +88,18 @@ void initGyro(void)
 //返回值:    无                                                               
 //说明:      读取ITG3205陀螺仪原始数据 加上零点修正值
 ///////////////////////////////////////////////////////////////////////////////////
+void getGyroOffset()
+{
+  uint8 regAddress = 0x1D; // ignoring temperature, start from X axis
+  uint8 buff[G_TO_READ];
+
+  readFrom(GYRO, regAddress, G_TO_READ, buff); //读取陀螺仪ITG3200的数据
+
+  AN[0] = (((int16)buff[0]) << 8) | buff[1];    // X axis
+  AN[1] = (((int16)buff[2]) << 8) | buff[3];    // Y axis
+  AN[2] = (((int16)buff[4]) << 8) | buff[5];    // Z axis
+}
+
 void getGyroscopeRaw(int16 * result)
 {
   //////////////////////////////////////
@@ -99,22 +111,17 @@ void getGyroscopeRaw(int16 * result)
   // z axis MSB = 21, z axis LSB = 22
   /////////////////////////////////////
 
-  uint8 regAddress = 0x1B;
+  uint8 regAddress = 0x1D; // ignoring temperature, start from X axis
   uint8 buff[G_TO_READ];
 
   readFrom(GYRO, regAddress, G_TO_READ, buff); //读取陀螺仪ITG3200的数据
 
-  GYROa[0] = (((int16)buff[2]) << 8) | buff[1];    // X axis
-  GYROa[1] = (((int16)buff[4]) << 8) | buff[3];    // Y axis
-  GYROa[2] = (((int16)buff[6]) << 8) | buff[5];    // Z axis
-  AN[0] = GYROa[0];
-  AN[1] = GYROa[1];
-  AN[2] = GYROa[2];
-  result[0] = SENSOR_SIGN[0]*(GYROa[0]-AN_OFFSET[0]);
-  result[1] = SENSOR_SIGN[1]*(GYROa[1]-AN_OFFSET[1]);
-  result[2] = SENSOR_SIGN[2]*(GYROa[2]-AN_OFFSET[2]);
-  result[3] = ((int16)buff[0] << 8) | buff[1]; // temperature
+  result[0] = SENSOR_SIGN[0]*(((((int16)buff[0]) << 8) | buff[1])-AN_OFFSET[0]);
+  result[1] = SENSOR_SIGN[1]*(((((int16)buff[2]) << 8) | buff[3])-AN_OFFSET[1]);
+  result[2] = SENSOR_SIGN[2]*(((((int16)buff[4]) << 8) | buff[5])-AN_OFFSET[2]);
+  //result[3] = ((int16)buff[0] << 8) | buff[1]; // temperature
 }
+
 
 ////////////////////////////////////////////////////////////////////////////////////
 //函数原型:  void getGyroscopeData(int16 * result)           	     
