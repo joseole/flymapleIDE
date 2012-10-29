@@ -1,5 +1,5 @@
 
-#define twoKpDef  (2.0f * 0.5f) // 2 * proportional gain 两倍比例增益
+#define twoKpDef  (2.0f * 0.1f) // 2 * proportional gain 两倍比例增益
 #define twoKiDef  (2.0f * 0.1f) // 2 * integral gain    两倍积分增益
 
 // ADXL345 Sensitivity(from datasheet) => 4mg/LSB   1G => 1000mg/4mg = 256 steps
@@ -276,7 +276,8 @@ void AHRSgetQ(float * q)
   lastUpdate = now;
   // 9DOF IMU
   // gyro values are expressed in deg/sec, the * M_PI/180 will convert it to radians/sec
-  AHRSupdate(val[0] * M_PI/180, val[1] * M_PI/180, val[2] * M_PI/180, val[3], val[4], val[5], val[6], val[7], val[8]);
+  //AHRSupdate(val[0] * M_PI/180, val[1] * M_PI/180, val[2] * M_PI/180, val[3], val[4], val[5], val[6], val[7], val[8]);
+  AHRSupdate(val[0], val[1], val[2], val[3], val[4], val[5], val[6], val[7], val[8]);
   // 6DOF IMU
   //AHRSupdate(val[0], val[1], val[2], val[3], val[4], val[5], 0.0f, 0.0f, 0.0f);
   q[0] = q0;
@@ -350,23 +351,45 @@ void Display_Raw(void)
   while(1)
   {  
     AHRSgetValues(data);
-    SerialUSB.print(data[0]);
-    SerialUSB.print(" | ");  
-    SerialUSB.print(data[1]);
-    SerialUSB.print(" | ");  
-    SerialUSB.print(data[2]);
-    SerialUSB.print(" | ");  
-    SerialUSB.print(data[3]);
-    SerialUSB.print(" | ");  
-    SerialUSB.print(data[4]);
-    SerialUSB.print(" | ");  
-    SerialUSB.print(data[5]);
-    SerialUSB.print(" | ");  
-    SerialUSB.print(data[6]);
-    SerialUSB.print(" | ");  
-    SerialUSB.print(data[7]);
-    SerialUSB.print(" | ");  
-    SerialUSB.println(data[8]);
+    //display quaternion values
+    SerialUSB.print(q0q0);
+    SerialUSB.print(" | ");
+    SerialUSB.print(q0q1);
+    SerialUSB.print(" | ");
+    SerialUSB.print(q0q2);
+    SerialUSB.print(" | ");
+    SerialUSB.print(q0q3);
+    SerialUSB.print(" | ");
+    SerialUSB.print(q1q1);
+    SerialUSB.print(" | ");
+    SerialUSB.print(q1q2);
+    SerialUSB.print(" | ");
+    SerialUSB.print(q1q3);
+    SerialUSB.print(" | ");
+    SerialUSB.print(q2q2);
+    SerialUSB.print(" | ");
+    SerialUSB.print(q2q3);
+    SerialUSB.print(" | ");
+    SerialUSB.println(q3q3);
+  
+  
+//    SerialUSB.print(data[0]);
+//    SerialUSB.print(" | ");  
+//    SerialUSB.print(data[1]);
+//    SerialUSB.print(" | ");  
+//    SerialUSB.print(data[2]);
+//    SerialUSB.print(" | ");  
+//    SerialUSB.print(data[3]);
+//    SerialUSB.print(" | ");  
+//    SerialUSB.print(data[4]);
+//    SerialUSB.print(" | ");  
+//    SerialUSB.print(data[5]);
+//    SerialUSB.print(" | ");  
+//    SerialUSB.print(data[6]);
+//    SerialUSB.print(" | ");  
+//    SerialUSB.print(data[7]);
+//    SerialUSB.print(" | ");  
+//    SerialUSB.println(data[8]);
     delay(100);   
   }
 }
@@ -378,15 +401,15 @@ void AHRS_Cube(void)
   while(1)
   {
     AHRSgetQ(q);
-    //    SerialUSB.print(q[0]);
-    //    SerialUSB.print(" | ");  
-    //    SerialUSB.print(q[1]);
-    //    SerialUSB.print(" | ");  
-    //    SerialUSB.print(q[2]);
-    //    SerialUSB.print(" | ");  
-    //    SerialUSB.print(q[3]);
-    //    SerialUSB.print(" | ");  
-    serialPrintFloatArr(q,4);
+    SerialUSB.print(q[0]);
+    SerialUSB.print(" | ");  
+    SerialUSB.print(q[1]);
+    SerialUSB.print(" | ");  
+    SerialUSB.print(q[2]);
+    SerialUSB.print(" | ");  
+    SerialUSB.print(q[3]);
+    SerialUSB.print(" | ");  
+    //serialPrintFloatArr(q,4);
     SerialUSB.println(""); //line break
     delay(5);
   }
